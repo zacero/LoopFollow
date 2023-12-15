@@ -8,6 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		3F1335F351590E573D8E6962 /* Pods_LoopFollow.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7D55B42A22051DAD69E89D0 /* Pods_LoopFollow.framework */; };
+		B61ECEFA2B2CB312001218CC /* BuildDetails.plist in Resources */ = {isa = PBXBuildFile; fileRef = B61ECEF92B2CB312001218CC /* BuildDetails.plist */; };
+		B61ECEFC2B2CB32E001218CC /* BuildDetails.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61ECEFB2B2CB32E001218CC /* BuildDetails.swift */; };
+		B61ECEFE2B2CB349001218CC /* AppExpirationAlerter.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61ECEFD2B2CB349001218CC /* AppExpirationAlerter.swift */; };
+		B61ECF002B2CB350001218CC /* AppExpirationAlerterRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61ECEFF2B2CB350001218CC /* AppExpirationAlerterRepresentable.swift */; };
+		B61ECF022B2CB47F001218CC /* TimeInterval.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61ECF012B2CB47F001218CC /* TimeInterval.swift */; };
+		B61ECF042B2D1944001218CC /* Bundle+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B61ECF032B2D1944001218CC /* Bundle+Extensions.swift */; };
 		DD07B5C929E2F9C400C6A635 /* NightscoutUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD07B5C829E2F9C400C6A635 /* NightscoutUtils.swift */; };
 		DD152D3B24C01B2300361FA2 /* InfoDisplaySettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD152D3A24C01B2300361FA2 /* InfoDisplaySettingsViewController.swift */; };
 		DD493AD52ACF2109009A6922 /* ResumePump.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD493AD42ACF2109009A6922 /* ResumePump.swift */; };
@@ -193,6 +199,12 @@
 /* Begin PBXFileReference section */
 		059B0FA59AABFE72FE13DDDA /* Pods-LoopFollow.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LoopFollow.release.xcconfig"; path = "Target Support Files/Pods-LoopFollow/Pods-LoopFollow.release.xcconfig"; sourceTree = "<group>"; };
 		A7D55B42A22051DAD69E89D0 /* Pods_LoopFollow.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LoopFollow.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		B61ECEF92B2CB312001218CC /* BuildDetails.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = BuildDetails.plist; sourceTree = "<group>"; };
+		B61ECEFB2B2CB32E001218CC /* BuildDetails.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BuildDetails.swift; path = Models/BuildDetails.swift; sourceTree = "<group>"; };
+		B61ECEFD2B2CB349001218CC /* AppExpirationAlerter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AppExpirationAlerter.swift; path = Views/AppExpirationAlerter.swift; sourceTree = "<group>"; };
+		B61ECEFF2B2CB350001218CC /* AppExpirationAlerterRepresentable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AppExpirationAlerterRepresentable.swift; path = Views/AppExpirationAlerterRepresentable.swift; sourceTree = "<group>"; };
+		B61ECF012B2CB47F001218CC /* TimeInterval.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimeInterval.swift; sourceTree = "<group>"; };
+		B61ECF032B2D1944001218CC /* Bundle+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Bundle+Extensions.swift"; sourceTree = "<group>"; };
 		DD07B5C829E2F9C400C6A635 /* NightscoutUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutUtils.swift; sourceTree = "<group>"; };
 		DD152D3A24C01B2300361FA2 /* InfoDisplaySettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoDisplaySettingsViewController.swift; sourceTree = "<group>"; };
 		DD493AD42ACF2109009A6922 /* ResumePump.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResumePump.swift; sourceTree = "<group>"; };
@@ -446,10 +458,12 @@
 		DD98F54224BCEF190007425A /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				B61ECF032B2D1944001218CC /* Bundle+Extensions.swift */,
 				DD98F54324BCEFEE0007425A /* ShareClientExtension.swift */,
 				DDCF979324C0D380002C9752 /* UIViewExtension.swift */,
 				FC1BB3A7252CA4C5003839C2 /* UIImageExtension.swift */,
 				DD7FFAFC2A72953000C3A304 /* EKEventStore+Extensions.swift */,
+				B61ECF012B2CB47F001218CC /* TimeInterval.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -616,6 +630,10 @@
 		FC8DEEE32485D1680075863F /* LoopFollow */ = {
 			isa = PBXGroup;
 			children = (
+				B61ECEFF2B2CB350001218CC /* AppExpirationAlerterRepresentable.swift */,
+				B61ECEFD2B2CB349001218CC /* AppExpirationAlerter.swift */,
+				B61ECEFB2B2CB32E001218CC /* BuildDetails.swift */,
+				B61ECEF92B2CB312001218CC /* BuildDetails.plist */,
 				FCC688702489A57C00A0279D /* Loop Follow.entitlements */,
 				FC8DEEE62485D1ED0075863F /* Info.plist */,
 				FC7CE59A248D334B001F83B8 /* Resources */,
@@ -786,6 +804,7 @@
 				FC7CE53F248ABE37001F83B8 /* Siri_Alert_Glucose_Dropping_Fast.caf in Resources */,
 				FC7CE561248ABE37001F83B8 /* Wrong_Answer.caf in Resources */,
 				FCC6885C2489559400A0279D /* blank.wav in Resources */,
+				B61ECEFA2B2CB312001218CC /* BuildDetails.plist in Resources */,
 				FC7CE528248ABE37001F83B8 /* Cartoon_Bounce_To_Ceiling.caf in Resources */,
 				FC7CE57B248ABE37001F83B8 /* Alert_Tone_Busy.caf in Resources */,
 				FC7CE51B248ABE37001F83B8 /* Thunder_Sound_FX.caf in Resources */,
@@ -931,6 +950,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B61ECEFE2B2CB349001218CC /* AppExpirationAlerter.swift in Sources */,
 				FCC68850248935D800A0279D /* AlarmViewController.swift in Sources */,
 				FC7CE59F248D8D23001F83B8 /* SnoozeViewController.swift in Sources */,
 				DD7FFAFD2A72953000C3A304 /* EKEventStore+Extensions.swift in Sources */,
@@ -947,6 +967,8 @@
 				DD7E19862ACDA59700DBD158 /* BGCheck.swift in Sources */,
 				FC16A97D24996747003D6245 /* Alarms.swift in Sources */,
 				FC16A97B249966A3003D6245 /* AlarmSound.swift in Sources */,
+				B61ECF002B2CB350001218CC /* AppExpirationAlerterRepresentable.swift in Sources */,
+				B61ECEFC2B2CB32E001218CC /* BuildDetails.swift in Sources */,
 				DD493AE72ACF23CF009A6922 /* DeviceStatus.swift in Sources */,
 				FCFEECA2248857A600402A7F /* SettingsViewController.swift in Sources */,
 				FCFEECA02488157B00402A7F /* Chart.swift in Sources */,
@@ -976,6 +998,7 @@
 				DD98F54424BCEFEE0007425A /* ShareClientExtension.swift in Sources */,
 				FCC6886D2489909D00A0279D /* AnyConvertible.swift in Sources */,
 				FC97881A2485969B00A7906C /* SceneDelegate.swift in Sources */,
+				B61ECF042B2D1944001218CC /* Bundle+Extensions.swift in Sources */,
 				DD7E198A2ACDA62600DBD158 /* SensorStart.swift in Sources */,
 				FCD49B6C24AA536E007879DC /* DebugViewController.swift in Sources */,
 				FC1BDD2B24A22650001B652C /* Stats.swift in Sources */,
@@ -989,6 +1012,7 @@
 				DD493ADD2ACF21E0009A6922 /* Basals.swift in Sources */,
 				FC16A98124996C07003D6245 /* DateTime.swift in Sources */,
 				FC3CAB022493B6220068A152 /* BackgroundTaskAudio.swift in Sources */,
+				B61ECF022B2CB47F001218CC /* TimeInterval.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

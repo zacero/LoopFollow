@@ -49,10 +49,18 @@ class SettingsViewController: FormViewController {
        UserDefaultsRepository.showNS.value = false
        UserDefaultsRepository.showDex.value = false
     
-        var expiration: Date = Date()
-        if let provision = MobileProvision.read() {
-            expiration = provision.expirationDate
-        }
+       var expiration: Date = Date()
+       if let provision = MobileProvision.read() {
+           expiration = provision.expirationDate
+       }
+       print(" *** expiration,", expiration)
+
+       // not right - just puts in today's date - need to figure out access to BuildDetails
+       let profileExpiration = BuildDetails.default.profileExpiration ?? expiration
+       
+       let expirationDate = AppExpirationAlerter.calculateExpirationDate(profileExpiration: profileExpiration)
+
+       print(" *** expirationDate,", expirationDate)
                         
         form
         +++ Section(header: "Data Settings", footer: "")

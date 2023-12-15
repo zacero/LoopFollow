@@ -32,13 +32,14 @@ class AppExpirationAlerter {
             return
         }
 
-        let minimumTimeBetweenAlerts: TimeInterval = timeUntilExpiration > .hours(24) ? .days(2) : .hours(1)
+        /*let minimumTimeBetweenAlerts: TimeInterval = timeUntilExpiration > .hours(24) ? .days(2) : .hours(1)
         
-        if let lastAlertDate = UserDefaults.appGroup?.lastProfileExpirationAlertDate {
+        if let lastAlertDate = UserDefaults.lastProfileExpirationAlertDate {
             guard now > lastAlertDate + minimumTimeBetweenAlerts else {
                 return
             }
         }
+         */
         
         let formatter = DateComponentsFormatter()
         formatter.allowedUnits = [.day, .hour]
@@ -72,14 +73,14 @@ class AppExpirationAlerter {
         }
         viewControllerToPresentFrom.present(dialog, animated: true, completion: nil)
         
-        UserDefaults.appGroup?.lastProfileExpirationAlertDate = now
+        //UserDefaults.appGroup?.lastProfileExpirationAlertDate = now
     }
     
     static func createVerboseAlertMessage(timeUntilExpirationStr:String) -> String {
         if isTestFlightBuild() {
-            return String(format: NSLocalizedString("%1$@ will stop working in %2$@. You will need to rebuild before that.", comment: "Format string for body for notification of upcoming expiration. (1: app name) (2: amount of time until expiration"), Bundle.main.bundleDisplayName, timeUntilExpirationStr)
+            return String(format: NSLocalizedString("%1$@ will stop working in %2$@. You will need to rebuild before that.", comment: "Format string for body for notification of upcoming expiration. (1: app name) (2: amount of time until expiration"), "LoopFollow", timeUntilExpirationStr)
         } else {
-            return String(format: NSLocalizedString("%1$@ will stop working in %2$@. You will need to update before that, with a new provisioning profile.", comment: "Format string for body for notification of upcoming provisioning profile expiration. (1: app name) (2: amount of time until expiration"), Bundle.main.bundleDisplayName, timeUntilExpirationStr)
+            return String(format: NSLocalizedString("%1$@ will stop working in %2$@. You will need to update before that, with a new provisioning profile.", comment: "Format string for body for notification of upcoming provisioning profile expiration. (1: app name) (2: amount of time until expiration"), "LoopFollow", timeUntilExpirationStr)
         }
     }
     
