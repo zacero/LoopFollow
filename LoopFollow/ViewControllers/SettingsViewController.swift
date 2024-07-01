@@ -12,15 +12,14 @@ import EventKit
 import EventKitUI
 
 class SettingsViewController: FormViewController {
-
-   var appStateController: AppStateController?
+    var tokenRow: TextRow?
+    var appStateController: AppStateController?
     var statusLabelRow: LabelRow!
 
     func showHideNSDetails() {
         var isHidden = false
         var isEnabled = true
-        var isLoopHidden = false;
-        if UserDefaultsRepository.url.value == "" || !UserDefaultsRepository.loopUser.value {
+        if UserDefaultsRepository.url.value == "" {
             isHidden = true
             isEnabled = false
         }
@@ -38,51 +37,6 @@ class SettingsViewController: FormViewController {
         
         guard let nightscoutTab = self.tabBarController?.tabBar.items![3] else { return }
         nightscoutTab.isEnabled = isEnabled
-        
-    }
-   
-    // Determine if the build is from TestFlight
-    func isTestFlightBuild() -> Bool {
-#if targetEnvironment(simulator)
-        return false
-#else
-        if Bundle.main.url(forResource: "embedded", withExtension: "mobileprovision") != nil {
-            return false
-        }
-        guard let receiptName = Bundle.main.appStoreReceiptURL?.lastPathComponent else {
-            return false
-        }
-        return "sandboxReceipt".caseInsensitiveCompare(receiptName) == .orderedSame
-#endif
-    }
-    
-    // Get the build date from the build details
-    func buildDate() -> Date? {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "EEE MMM d HH:mm:ss 'UTC' yyyy"
-        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-        dateFormatter.timeZone = TimeZone(identifier: "UTC")
-        
-        guard let dateString = BuildDetails.default.buildDateString,
-              let date = dateFormatter.date(from: dateString) else {
-            return nil
-        }
-        return date
-    }
-    
-    // Calculate the expiration date based on the build type
-    func calculateExpirationDate() -> Date {
-        if isTestFlightBuild(), let buildDate = buildDate() {
-            // For TestFlight, add 90 days to the build date
-            return Calendar.current.date(byAdding: .day, value: 90, to: buildDate)!
-        } else {
-            // For Xcode builds, use the provisioning profile's expiration date
-            if let provision = MobileProvision.read() {
-                return provision.expirationDate
-            } else {
-                return Date() // Fallback to current date if unable to read provisioning profile
-            }
-        }
     }
     
    override func viewDidLoad() {
@@ -93,12 +47,14 @@ class SettingsViewController: FormViewController {
        UserDefaultsRepository.showNS.value = false
        UserDefaultsRepository.showDex.value = false
     
-       let expiration = calculateExpirationDate()
-       var expirationHeaderString = "App Expiration"
-       if isTestFlightBuild() {
-          expirationHeaderString = "Beta (TestFlight) Expiration"
-       }
-       
+       let buildDetails = BuildDetails.default
+       let formattedBuildDate = dateTimeUtils.formattedDate(from: buildDetails.buildDate())
+       let branchAndSha = buildDetails.branchAndSha
+       let expiration = dateTimeUtils.formattedDate(from: buildDetails.calculateExpirationDate())
+       let expirationHeaderString = buildDetails.expirationHeaderString
+       let versionManager = AppVersionManager()
+       let version = versionManager.version()
+
         form
         +++ Section(header: "Data Settings", footer: "")
        <<< SegmentedRow<String>("units") { row in
@@ -131,22 +87,46 @@ class SettingsViewController: FormViewController {
                return
            }
            
-           // Normalize input: remove unwanted characters and lowercase
-           let filtered = value.replacingOccurrences(of: "[^A-Za-z0-9:/._-]", with: "", options: .regularExpression).lowercased()
+           var useTokenUrl = false
            
-           // Further clean-up: Remove trailing slashes
-           var cleanURL = filtered
-           while cleanURL.last == "/" {
-               cleanURL = String(cleanURL.dropLast())
+           // Attempt to handle special case: pasted URL including token
+           if let urlComponents = URLComponents(string: value), let queryItems = urlComponents.queryItems {
+               if let tokenItem = queryItems.first(where: { $0.name.lowercased() == "token" }) {
+                   let tokenPattern = "^[^-\\s]+-[0-9a-fA-F]{16}$"
+                   if let token = tokenItem.value, let _ = token.range(of: tokenPattern, options: .regularExpression) {
+                       var baseComponents = urlComponents
+                       baseComponents.queryItems = nil
+                       if let baseURL = baseComponents.string {
+                           UserDefaultsRepository.token.value = token
+                           self.tokenRow?.value = token
+                           self.tokenRow?.updateCell()
+
+                           UserDefaultsRepository.url.value = baseURL
+                           row.value = baseURL
+                           row.updateCell()
+                           useTokenUrl = true
+                       }
+                   }
+               }
            }
            
-           // Set the cleaned URL
-           UserDefaultsRepository.url.value = cleanURL
-           row.value = cleanURL
-           
+           if !useTokenUrl {
+               // Normalize input: remove unwanted characters and lowercase
+               let filtered = value.replacingOccurrences(of: "[^A-Za-z0-9:/._-]", with: "", options: .regularExpression).lowercased()
+
+               // Further clean-up: Remove trailing slashes
+               var cleanURL = filtered
+               while cleanURL.count > 8 && cleanURL.last == "/" {
+                   cleanURL = String(cleanURL.dropLast())
+               }
+
+               UserDefaultsRepository.url.value = cleanURL
+               row.value = cleanURL
+               row.updateCell()
+           }
+
            self.showHideNSDetails()
-           globalVariables.nsVerifiedAlert = 0
-           
+
            // Verify Nightscout URL and token
            self.checkNightscoutStatus()
        }
@@ -156,6 +136,7 @@ class SettingsViewController: FormViewController {
            row.placeholder = "Leave blank if not using tokens"
            row.value = UserDefaultsRepository.token.value
            row.hidden = "$showNS == false"
+           self.tokenRow = row
        }.cellSetup { (cell, row) in
            cell.textField.autocorrectionType = .no
            cell.textField.autocapitalizationType = .none
@@ -166,7 +147,6 @@ class SettingsViewController: FormViewController {
            }
            guard let value = row.value else { return }
            UserDefaultsRepository.token.value = value
-           globalVariables.nsVerifiedAlert = 0
            
            // Verify Nightscout URL and token
            self.checkNightscoutStatus()
@@ -177,16 +157,6 @@ class SettingsViewController: FormViewController {
            statusLabelRow = row
            row.hidden = "$showNS == false"
        }
-       <<< SwitchRow("loopUser"){ row in
-           row.title = "Download Loop/iAPS Data"
-           row.tag = "loopUser"
-           row.value = UserDefaultsRepository.loopUser.value
-           row.hidden = "$showNS == false"
-       }.onChange { row in
-                   guard let value = row.value else { return }
-                   UserDefaultsRepository.loopUser.value = value
-           }
-        
        <<< SwitchRow("showDex"){ row in
        row.title = "Show Dexcom Settings"
        row.value = UserDefaultsRepository.showDex.value
@@ -207,7 +177,6 @@ class SettingsViewController: FormViewController {
             }
             guard let value = row.value else { return }
             UserDefaultsRepository.shareUserName.value = value
-            globalVariables.dexVerifiedAlert = 0
         }
         <<< TextRow(){ row in
             row.title = "Password"
@@ -223,7 +192,6 @@ class SettingsViewController: FormViewController {
             }
             guard let value = row.value else { return }
             UserDefaultsRepository.sharePassword.value = value
-            globalVariables.dexVerifiedAlert = 0
         }
         <<< SegmentedRow<String>("shareServer") { row in
             row.title = "Server"
@@ -295,14 +263,69 @@ class SettingsViewController: FormViewController {
             
         }
 
-       +++ Section(header: getAppVersion(), footer: "")
-       
-       if !isMacApp() {
-           form +++ Section(header: expirationHeaderString, footer: String(expiration.description))
+       +++ Section("Build Information")
+       <<< LabelRow() {
+           $0.title = "Version"
+           $0.value = version
+           $0.tag = "currentVersionRow"
+       }
+       <<< LabelRow() {
+           $0.title = "Latest version"
+           $0.value = "Fetching..."
+           $0.tag = "latestVersionRow"
+       }
+       <<< LabelRow() {
+           $0.title = expirationHeaderString
+           $0.value = expiration
+           $0.hidden = Condition(booleanLiteral: isMacApp())
+       }
+       <<< LabelRow() {
+           $0.title = "Built"
+           $0.value = formattedBuildDate
+       }
+       <<< LabelRow() {
+           $0.title = "Branch"
+           $0.value = branchAndSha
        }
        
        showHideNSDetails()
        checkNightscoutStatus()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        refreshVersionInfo()
+        checkNightscoutStatus()
+    }
+    
+    func refreshVersionInfo() {
+        let versionManager = AppVersionManager()
+        versionManager.checkForNewVersion { latestVersion, isNewer, isBlacklisted in
+            DispatchQueue.main.async {
+                if let currentVersionRow = self.form.rowBy(tag: "currentVersionRow") as? LabelRow {
+                    currentVersionRow.cell.detailTextLabel?.textColor = self.getColor(isBlacklisted: isBlacklisted, isNewer: isNewer, isCurrent: latestVersion == versionManager.version())
+                    currentVersionRow.updateCell()
+                }
+                
+                if let latestVersionRow = self.form.rowBy(tag: "latestVersionRow") as? LabelRow {
+                    latestVersionRow.value = latestVersion ?? "Unknown"
+                    latestVersionRow.updateCell()
+                }
+            }
+        }
+    }
+    
+    private func getColor(isBlacklisted: Bool, isNewer: Bool, isCurrent: Bool) -> UIColor {
+        if isBlacklisted {
+            return .red
+        } else if isNewer {
+            return .orange
+        } else if isCurrent {
+            return .green
+        } else {
+            return .secondaryLabel
+        }
     }
     
     func isMacApp() -> Bool {
@@ -311,13 +334,6 @@ class SettingsViewController: FormViewController {
 #else
         return false
 #endif
-    }
-
-    func getAppVersion() -> String {
-        if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String {
-            return "App Version: \(version)"
-        }
-        return "Version Unknown"
     }
     
     func updateStatusLabel(error: NightscoutUtils.NightscoutError?) {

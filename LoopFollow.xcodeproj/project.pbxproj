@@ -21,6 +21,10 @@
 		DD493AE52ACF2383009A6922 /* Treatments.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD493AE42ACF2383009A6922 /* Treatments.swift */; };
 		DD493AE72ACF23CF009A6922 /* DeviceStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD493AE62ACF23CF009A6922 /* DeviceStatus.swift */; };
 		DD493AE92ACF2445009A6922 /* BGData.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD493AE82ACF2445009A6922 /* BGData.swift */; };
+		DD608A082C1F584900F91132 /* DeviceStatusLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD608A072C1F584900F91132 /* DeviceStatusLoop.swift */; };
+		DD608A0C2C27415C00F91132 /* BackgroundAlertManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD608A0B2C27415C00F91132 /* BackgroundAlertManager.swift */; };
+		DD608A0A2C23593900F91132 /* SMB.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD608A092C23593900F91132 /* SMB.swift */; };
+		DD6A935E2BFA6FA2003FFB8E /* DeviceStatusOpenAPS.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD6A935D2BFA6FA2003FFB8E /* DeviceStatusOpenAPS.swift */; };
 		DD7E19842ACDA50C00DBD158 /* Overrides.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD7E19832ACDA50C00DBD158 /* Overrides.swift */; };
 		DD7E19862ACDA59700DBD158 /* BGCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD7E19852ACDA59700DBD158 /* BGCheck.swift */; };
 		DD7E19882ACDA5DA00DBD158 /* Notes.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD7E19872ACDA5DA00DBD158 /* Notes.swift */; };
@@ -37,6 +41,9 @@
 		DDCF979C24C14EFB002C9752 /* AdvancedSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDCF979B24C14EFB002C9752 /* AdvancedSettingsViewController.swift */; };
 		DDCF979E24C2382A002C9752 /* AppStateController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDCF979D24C2382A002C9752 /* AppStateController.swift */; };
 		DDCFCAF22B17273200BE5751 /* LoopFollowDisplayNameConfig.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = DDCFCAF12B17273200BE5751 /* LoopFollowDisplayNameConfig.xcconfig */; };
+		DDF2C0102BEFA991007A20E6 /* GitHubService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF2C00F2BEFA991007A20E6 /* GitHubService.swift */; };
+		DDF2C0122BEFB733007A20E6 /* AppVersionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF2C0112BEFB733007A20E6 /* AppVersionManager.swift */; };
+		DDF2C0142BEFD468007A20E6 /* blacklisted-versions.json in Resources */ = {isa = PBXBuildFile; fileRef = DDF2C0132BEFD468007A20E6 /* blacklisted-versions.json */; };
 		DDF9676E2AD08C6E00C5EB95 /* SiteChange.swift in Sources */ = {isa = PBXBuildFile; fileRef = DDF9676D2AD08C6E00C5EB95 /* SiteChange.swift */; };
 		FC16A97A24996673003D6245 /* NightScout.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC16A97924996673003D6245 /* NightScout.swift */; };
 		FC16A97B249966A3003D6245 /* AlarmSound.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC7CE589248ABEA3001F83B8 /* AlarmSound.swift */; };
@@ -208,6 +215,10 @@
 		DD493AE42ACF2383009A6922 /* Treatments.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Treatments.swift; sourceTree = "<group>"; };
 		DD493AE62ACF23CF009A6922 /* DeviceStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceStatus.swift; sourceTree = "<group>"; };
 		DD493AE82ACF2445009A6922 /* BGData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BGData.swift; sourceTree = "<group>"; };
+		DD608A072C1F584900F91132 /* DeviceStatusLoop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceStatusLoop.swift; sourceTree = "<group>"; };
+		DD608A0B2C27415C00F91132 /* BackgroundAlertManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundAlertManager.swift; sourceTree = "<group>"; };
+		DD608A092C23593900F91132 /* SMB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SMB.swift; sourceTree = "<group>"; };
+		DD6A935D2BFA6FA2003FFB8E /* DeviceStatusOpenAPS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceStatusOpenAPS.swift; sourceTree = "<group>"; };
 		DD7E19832ACDA50C00DBD158 /* Overrides.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Overrides.swift; sourceTree = "<group>"; };
 		DD7E19852ACDA59700DBD158 /* BGCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BGCheck.swift; sourceTree = "<group>"; };
 		DD7E19872ACDA5DA00DBD158 /* Notes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notes.swift; sourceTree = "<group>"; };
@@ -225,6 +236,9 @@
 		DDCF979B24C14EFB002C9752 /* AdvancedSettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdvancedSettingsViewController.swift; sourceTree = "<group>"; };
 		DDCF979D24C2382A002C9752 /* AppStateController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateController.swift; sourceTree = "<group>"; };
 		DDCFCAF12B17273200BE5751 /* LoopFollowDisplayNameConfig.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = LoopFollowDisplayNameConfig.xcconfig; sourceTree = "<group>"; };
+		DDF2C00F2BEFA991007A20E6 /* GitHubService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitHubService.swift; sourceTree = "<group>"; };
+		DDF2C0112BEFB733007A20E6 /* AppVersionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionManager.swift; sourceTree = "<group>"; };
+		DDF2C0132BEFD468007A20E6 /* blacklisted-versions.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "blacklisted-versions.json"; sourceTree = "<group>"; };
 		DDF9676D2AD08C6E00C5EB95 /* SiteChange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteChange.swift; sourceTree = "<group>"; };
 		ECA3EFB4037410B4973BB632 /* Pods-LoopFollow.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LoopFollow.debug.xcconfig"; path = "Target Support Files/Pods-LoopFollow/Pods-LoopFollow.debug.xcconfig"; sourceTree = "<group>"; };
 		FC16A97924996673003D6245 /* NightScout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightScout.swift; sourceTree = "<group>"; };
@@ -430,6 +444,7 @@
 				DD493ADA2ACF21A3009A6922 /* Bolus.swift */,
 				DD493AD42ACF2109009A6922 /* ResumePump.swift */,
 				DDF9676D2AD08C6E00C5EB95 /* SiteChange.swift */,
+				DD608A092C23593900F91132 /* SMB.swift */,
 			);
 			path = Treatments;
 			sourceTree = "<group>";
@@ -444,6 +459,8 @@
 				DD493AE42ACF2383009A6922 /* Treatments.swift */,
 				DD493AE62ACF23CF009A6922 /* DeviceStatus.swift */,
 				DD493AE82ACF2445009A6922 /* BGData.swift */,
+				DD6A935D2BFA6FA2003FFB8E /* DeviceStatusOpenAPS.swift */,
+				DD608A072C1F584900F91132 /* DeviceStatusLoop.swift */,
 			);
 			path = Nightscout;
 			sourceTree = "<group>";
@@ -489,6 +506,7 @@
 				FC1BDD2A24A22650001B652C /* Stats.swift */,
 				FC1BDD2C24A23204001B652C /* StatsView.swift */,
 				FCA2DDE52501095000254A8C /* Timers.swift */,
+				DD608A0B2C27415C00F91132 /* BackgroundAlertManager.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -644,6 +662,7 @@
 		FC97880B2485969B00A7906C = {
 			isa = PBXGroup;
 			children = (
+				DDF2C0132BEFD468007A20E6 /* blacklisted-versions.json */,
 				DDB0AF542BB1B24A00AFA48B /* BuildDetails.plist */,
 				DDB0AF4F2BB1A81F00AFA48B /* Scripts */,
 				DDCFCAF12B17273200BE5751 /* LoopFollowDisplayNameConfig.xcconfig */,
@@ -692,6 +711,8 @@
 				DD07B5C829E2F9C400C6A635 /* NightscoutUtils.swift */,
 				DDB0AF512BB1A8BE00AFA48B /* BuildDetails.swift */,
 				DD91E4DC2BDEC3F8002D9E97 /* GlucoseConversion.swift */,
+				DDF2C00F2BEFA991007A20E6 /* GitHubService.swift */,
+				DDF2C0112BEFB733007A20E6 /* AppVersionManager.swift */,
 			);
 			path = helpers;
 			sourceTree = "<group>";
@@ -818,6 +839,7 @@
 				FC7CE55D248ABE37001F83B8 /* Metallic.caf in Resources */,
 				FC7CE568248ABE37001F83B8 /* Sci-Fi_Engine_Shut_Down.caf in Resources */,
 				FC7CE580248ABE37001F83B8 /* Sci-Fi_Alarm.caf in Resources */,
+				DDF2C0142BEFD468007A20E6 /* blacklisted-versions.json in Resources */,
 				FC7CE533248ABE37001F83B8 /* Ending_Reached.caf in Resources */,
 				FC7CE558248ABE37001F83B8 /* Rush.caf in Resources */,
 				FC7CE52A248ABE37001F83B8 /* Nightguard.caf in Resources */,
@@ -973,13 +995,16 @@
 				FCC6886724898F8000A0279D /* UserDefaultsValue.swift in Sources */,
 				DDCF979E24C2382A002C9752 /* AppStateController.swift in Sources */,
 				FC97881E2485969B00A7906C /* NightScoutViewController.swift in Sources */,
+				DD608A0A2C23593900F91132 /* SMB.swift in Sources */,
 				DDCF979824C1489C002C9752 /* GraphSettingsViewController.swift in Sources */,
 				FC3AE7B5249E8E0E00AAE1E0 /* LoopFollow.xcdatamodeld in Sources */,
 				FCC6886F2489A53800A0279D /* AppConstants.swift in Sources */,
 				DD7E19842ACDA50C00DBD158 /* Overrides.swift in Sources */,
+				DDF2C0102BEFA991007A20E6 /* GitHubService.swift in Sources */,
 				FC16A97A24996673003D6245 /* NightScout.swift in Sources */,
 				DD07B5C929E2F9C400C6A635 /* NightscoutUtils.swift in Sources */,
 				FCC6886924898FB100A0279D /* UserDefaultsValueGroups.swift in Sources */,
+				DDF2C0122BEFB733007A20E6 /* AppVersionManager.swift in Sources */,
 				DD7E19862ACDA59700DBD158 /* BGCheck.swift in Sources */,
 				FC16A97D24996747003D6245 /* Alarms.swift in Sources */,
 				FC16A97B249966A3003D6245 /* AlarmSound.swift in Sources */,
@@ -1001,14 +1026,17 @@
 				DDF9676E2AD08C6E00C5EB95 /* SiteChange.swift in Sources */,
 				DDCF979C24C14EFB002C9752 /* AdvancedSettingsViewController.swift in Sources */,
 				FC97881C2485969B00A7906C /* MainViewController.swift in Sources */,
+				DD6A935E2BFA6FA2003FFB8E /* DeviceStatusOpenAPS.swift in Sources */,
 				DD493AD52ACF2109009A6922 /* ResumePump.swift in Sources */,
 				DDCF979624C1443C002C9752 /* GeneralSettingsViewController.swift in Sources */,
 				FCC0FAC224922A22003E610E /* DictionaryKeyPath.swift in Sources */,
 				DD493AD72ACF2139009A6922 /* SuspendPump.swift in Sources */,
 				FC9788182485969B00A7906C /* AppDelegate.swift in Sources */,
+				DD608A0C2C27415C00F91132 /* BackgroundAlertManager.swift in Sources */,
 				DD493AD92ACF2171009A6922 /* Carbs.swift in Sources */,
 				DD493AE92ACF2445009A6922 /* BGData.swift in Sources */,
 				FCC6886B24898FD800A0279D /* ObservationToken.swift in Sources */,
+				DD608A082C1F584900F91132 /* DeviceStatusLoop.swift in Sources */,
 				DD98F54424BCEFEE0007425A /* ShareClientExtension.swift in Sources */,
 				DD91E4DD2BDEC3F8002D9E97 /* GlucoseConversion.swift in Sources */,
 				FCC6886D2489909D00A0279D /* AnyConvertible.swift in Sources */,
