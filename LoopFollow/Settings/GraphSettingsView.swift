@@ -16,10 +16,9 @@ struct GraphSettingsView: View {
 
     @ObservedObject private var smallGraphHeight = Storage.shared.smallGraphHeight
     @ObservedObject private var predictionToLoad = Storage.shared.predictionToLoad
+    @ObservedObject private var predictionDisplayType = Storage.shared.predictionDisplayType
     @ObservedObject private var minBasalScale = Storage.shared.minBasalScale
     @ObservedObject private var minBGScale = Storage.shared.minBGScale
-    @ObservedObject private var lowLine = Storage.shared.lowLine
-    @ObservedObject private var highLine = Storage.shared.highLine
     @ObservedObject private var downloadDays = Storage.shared.downloadDays
 
     private var nightscoutEnabled: Bool { IsNightscoutEnabled() }
@@ -82,6 +81,15 @@ struct GraphSettingsView: View {
                             value: $predictionToLoad.value,
                             format: { "\($0.localized(maxFractionDigits: 2)) h" }
                         )
+
+                        if Storage.shared.device.value != "Loop" {
+                            Picker("Prediction Style", selection: $predictionDisplayType.value) {
+                                ForEach(PredictionDisplayType.allCases, id: \.self) { type in
+                                    Text(type.displayName).tag(type)
+                                }
+                            }
+                            .onChange(of: predictionDisplayType.value) { _ in markDirty() }
+                        }
                     }
                 }
 
@@ -103,19 +111,6 @@ struct GraphSettingsView: View {
                         )
                         .onChange(of: minBGScale.value) { _ in markDirty() }
                     }
-                }
-
-                // ── Target lines ─────────────────────────────────────────────
-                Section("Target Lines") {
-                    BGPicker(title: "Low BG Line",
-                             range: 40 ... 120,
-                             value: $lowLine.value)
-                        .onChange(of: lowLine.value) { _ in markDirty() }
-
-                    BGPicker(title: "High BG Line",
-                             range: 120 ... 400,
-                             value: $highLine.value)
-                        .onChange(of: highLine.value) { _ in markDirty() }
                 }
 
                 // ── History window ───────────────────────────────────────────

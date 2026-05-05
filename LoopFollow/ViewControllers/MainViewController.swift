@@ -42,7 +42,9 @@ class MainViewController: UIViewController, UITableViewDataSource, ChartViewDele
     @IBOutlet var statsInRangePercent: UILabel!
     @IBOutlet var statsHighPercent: UILabel!
     @IBOutlet var statsAvgBG: UILabel!
+    @IBOutlet var statsEstA1CTitle: UILabel!
     @IBOutlet var statsEstA1C: UILabel!
+    @IBOutlet var statsStdDevTitle: UILabel!
     @IBOutlet var statsStdDev: UILabel!
     @IBOutlet var serverText: UILabel!
     @IBOutlet var statsView: UIView!
@@ -91,6 +93,8 @@ class MainViewController: UIViewController, UITableViewDataSource, ChartViewDele
     var overrideGraphData: [DataStructs.overrideStruct] = []
     var tempTargetGraphData: [DataStructs.tempTargetStruct] = []
     var predictionData: [ShareGlucoseData] = []
+    var openAPSPredBGs: [String: [Double]]?
+    var openAPSPredUpdatedTime: TimeInterval?
     var bgCheckData: [ShareGlucoseData] = []
     var suspendGraphData: [DataStructs.timestampOnlyStruct] = []
     var resumeGraphData: [DataStructs.timestampOnlyStruct] = []
@@ -194,7 +198,10 @@ class MainViewController: UIViewController, UITableViewDataSource, ChartViewDele
         // when runMigrationsIfNeeded() is called. This catches migrations deferred by a
         // background BGAppRefreshTask launch in Before-First-Unlock state.
         notificationCenter.addObserver(self, selector: #selector(appDidBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
-        notificationCenter.addObserver(self, selector: #selector(navigateOnLAForeground), name: .liveActivityDidForeground, object: nil)
+
+        #if !targetEnvironment(macCatalyst)
+            notificationCenter.addObserver(self, selector: #selector(navigateOnLAForeground), name: .liveActivityDidForeground, object: nil)
+        #endif
 
         // Setup the Graph
         if firstGraphLoad {
@@ -285,10 +292,23 @@ class MainViewController: UIViewController, UITableViewDataSource, ChartViewDele
             }
             .store(in: &cancellables)
 
-        Storage.shared.useIFCC.$value
+        Publishers.MergeMany(
+            Storage.shared.units.$value.map { _ in () }.eraseToAnyPublisher(),
+            Storage.shared.useIFCC.$value.map { _ in () }.eraseToAnyPublisher(),
+            Storage.shared.showGMI.$value.map { _ in () }.eraseToAnyPublisher(),
+            Storage.shared.showStdDev.$value.map { _ in () }.eraseToAnyPublisher()
+        )
+        .receive(on: DispatchQueue.main)
+        .sink { [weak self] _ in
+            self?.updateStats()
+        }
+        .store(in: &cancellables)
+
+        Storage.shared.timeInRangeModeRaw.$value
             .receive(on: DispatchQueue.main)
             .sink { [weak self] _ in
-                self?.updateStats()
+                self?.updateBGGraphSettings()
+                self?.updateBGGraph()
             }
             .store(in: &cancellables)
 
@@ -419,6 +439,20 @@ class MainViewController: UIViewController, UITableViewDataSource, ChartViewDele
                 if shouldReset {
                     Storage.shared.remoteType.value = .none
                 }
+            }
+            .store(in: &cancellables)
+
+        Storage.shared.device.$value
+            .receive(on: DispatchQueue.main)
+            .map { device -> Bool? in
+                device.isEmpty ? nil : (device == "Loop")
+            }
+            .removeDuplicates()
+            .dropFirst()
+            .sink { [weak self] isLoop in
+                guard let isLoop = isLoop else { return }
+                Storage.shared.predictionDisplayType.value = isLoop ? .lines : .cone
+                self?.updateOpenAPSPredictionDisplay()
             }
             .store(in: &cancellables)
 
@@ -996,6 +1030,12 @@ class MainViewController: UIViewController, UITableViewDataSource, ChartViewDele
         // Capture before migrations run: true for existing users, false for fresh installs.
         let isExistingUser = Storage.shared.migrationStep.exists
 
+        // When adding a new migration step below:
+        //   1. Bump the `migrationStep` defaultValue in Storage.swift to the new latest step
+        //      number so fresh installs skip every migration.
+        //   2. Update any other StorageValue defaults in Storage.swift that this new step
+        //      mutates, so a fresh install ends up in the same state as a migrated user.
+
         // Step 1: Released in v3.0.0 (2025-07-07). Can be removed after 2026-07-07.
         if Storage.shared.migrationStep.value < 1 {
             Storage.shared.migrateStep1()
@@ -1037,6 +1077,11 @@ class MainViewController: UIViewController, UITableViewDataSource, ChartViewDele
             Storage.shared.migrateStep7()
             Storage.shared.migrationStep.value = 7
         }
+
+        if Storage.shared.migrationStep.value < 8 {
+            Storage.shared.migrateStep8()
+            Storage.shared.migrationStep.value = 8
+        }
     }
 
     @objc func appDidBecomeActive() {
@@ -1051,12 +1096,12 @@ class MainViewController: UIViewController, UITableViewDataSource, ChartViewDele
         // after a reboot), all StorageValues were cached from encrypted UserDefaults and hold
         // their defaults. Reload everything from disk now that the device is unlocked, firing
         // Combine observers only for values that actually changed.
-        LogManager.shared.log(category: .general, message: "appCameToForeground: needsBFUReload=\(Storage.shared.needsBFUReload), url='\(Storage.shared.url.value)'")
+        LogManager.shared.log(category: .general, message: "appCameToForeground: needsBFUReload=\(Storage.shared.needsBFUReload), url='\(LogRedactor.url(Storage.shared.url.value))'")
         if Storage.shared.needsBFUReload {
             Storage.shared.needsBFUReload = false
             LogManager.shared.log(category: .general, message: "BFU reload triggered — reloading all StorageValues")
             Storage.shared.reloadAll()
-            LogManager.shared.log(category: .general, message: "BFU reload complete: url='\(Storage.shared.url.value)'")
+            LogManager.shared.log(category: .general, message: "BFU reload complete: url='\(LogRedactor.url(Storage.shared.url.value))'")
             // Show the loading overlay so the user sees feedback during the 2-5s
             // while tasks re-run with the now-correct credentials.
             loadingStates = ["bg": false, "profile": false, "deviceStatus": false]
@@ -1205,10 +1250,11 @@ class MainViewController: UIViewController, UITableViewDataSource, ChartViewDele
             let latestBG = bgData[bgData.count - 1].sgv
             var color = NSUIColor.label
             if Storage.shared.colorBGText.value {
-                if Double(latestBG) >= Storage.shared.highLine.value {
+                let thresholds = UnitSettingsStore.shared.effectiveThresholds()
+                if Double(latestBG) >= thresholds.high {
                     color = NSUIColor.systemYellow
                     Observable.shared.bgTextColor.value = .yellow
-                } else if Double(latestBG) <= Storage.shared.lowLine.value {
+                } else if Double(latestBG) <= thresholds.low {
                     color = NSUIColor.systemRed
                     Observable.shared.bgTextColor.value = .red
                 } else {
@@ -1547,15 +1593,30 @@ class MainViewController: UIViewController, UITableViewDataSource, ChartViewDele
     }
 
     @objc private func setupNightscoutTapped() {
-        let nightscoutSettingsView = NightscoutSettingsView(viewModel: .init())
+        let navController = UINavigationController()
+        let nightscoutSettingsView = NightscoutSettingsView(viewModel: .init(), usesModalCloseButton: true, onContinueToUnits: { [weak navController] in
+            let unitsView = UnitsOnboardingView {
+                navController?.dismiss(animated: true)
+            }
+            let unitsController = UIHostingController(rootView: unitsView)
+            let style = Storage.shared.appearanceMode.value.userInterfaceStyle
+            unitsController.overrideUserInterfaceStyle = style
+            navController?.pushViewController(unitsController, animated: true)
+        }, onImportSettings: { [weak navController] in
+            let importSettingsView = ImportExportSettingsView()
+            let importSettingsController = UIHostingController(rootView: importSettingsView)
+            let style = Storage.shared.appearanceMode.value.userInterfaceStyle
+            importSettingsController.overrideUserInterfaceStyle = style
+            navController?.pushViewController(importSettingsController, animated: true)
+        })
         let hostingController = UIHostingController(rootView: nightscoutSettingsView)
-        let navController = UINavigationController(rootViewController: hostingController)
 
         // Apply appearance mode
         let style = Storage.shared.appearanceMode.value.userInterfaceStyle
         hostingController.overrideUserInterfaceStyle = style
         navController.overrideUserInterfaceStyle = style
 
+        navController.setViewControllers([hostingController], animated: false)
         hostingController.navigationItem.rightBarButtonItem = makeCloseBarButtonItem()
 
         navController.modalPresentationStyle = .pageSheet
@@ -1563,15 +1624,24 @@ class MainViewController: UIViewController, UITableViewDataSource, ChartViewDele
     }
 
     @objc private func setupDexcomTapped() {
-        let dexcomSettingsView = DexcomSettingsView(viewModel: .init())
+        let navController = UINavigationController()
+        let dexcomSettingsView = DexcomSettingsView(viewModel: .init(), usesModalCloseButton: true, onContinueToUnits: { [weak navController] in
+            let unitsView = UnitsOnboardingView {
+                navController?.dismiss(animated: true)
+            }
+            let unitsController = UIHostingController(rootView: unitsView)
+            let style = Storage.shared.appearanceMode.value.userInterfaceStyle
+            unitsController.overrideUserInterfaceStyle = style
+            navController?.pushViewController(unitsController, animated: true)
+        })
         let hostingController = UIHostingController(rootView: dexcomSettingsView)
-        let navController = UINavigationController(rootViewController: hostingController)
 
         // Apply appearance mode
         let style = Storage.shared.appearanceMode.value.userInterfaceStyle
         hostingController.overrideUserInterfaceStyle = style
         navController.overrideUserInterfaceStyle = style
 
+        navController.setViewControllers([hostingController], animated: false)
         hostingController.navigationItem.rightBarButtonItem = makeCloseBarButtonItem()
 
         navController.modalPresentationStyle = .pageSheet

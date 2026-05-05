@@ -2,11 +2,16 @@
 // SceneDelegate.swift
 
 import AVFoundation
+import SwiftUI
 import UIKit
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
     let synthesizer = AVSpeechSynthesizer()
+
+    /// One-shot guard so the consent prompt is only attempted once per
+    /// process lifetime even if the scene activates repeatedly.
+    private var consentPromptShownThisProcess = false
 
     func scene(_ scene: UIScene, willConnectTo _: UISceneSession, options _: UIScene.ConnectionOptions) {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
@@ -32,6 +37,37 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneDidBecomeActive(_: UIScene) {
         // Called when the scene has moved from an inactive state to an active state.
         // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
+        runTelemetryFirstForegroundHook()
+    }
+
+    /// Presents the one-time consent sheet on first foreground. Sending is
+    /// handled by AppDelegate at launch and by TaskScheduler thereafter —
+    /// firing maybeSend here would duplicate the launch-time send.
+    private func runTelemetryFirstForegroundHook() {
+        if !Storage.shared.telemetryConsentDecisionMade.value,
+           !consentPromptShownThisProcess
+        {
+            consentPromptShownThisProcess = true
+            presentTelemetryConsentSheet()
+        }
+    }
+
+    private func presentTelemetryConsentSheet() {
+        guard let root = window?.rootViewController else { return }
+        // Find the topmost presented controller so we don't try to present
+        // over a sheet that's already up.
+        var top = root
+        while let presented = top.presentedViewController {
+            top = presented
+        }
+
+        let host = UIHostingController(rootView: TelemetryConsentView())
+        host.isModalInPresentation = true // user must explicitly choose
+        // Defer to the next runloop so view hierarchy is settled when the
+        // scene first becomes active on a fresh install.
+        DispatchQueue.main.async {
+            top.present(host, animated: true)
+        }
     }
 
     func scene(_: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
@@ -39,9 +75,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // scene(_:openURLContexts:) fires after sceneDidBecomeActive when the app
         // foregrounds from background. Post on the next run loop so the view
         // hierarchy (including any presented modals) is fully settled.
-        DispatchQueue.main.async {
-            NotificationCenter.default.post(name: .liveActivityDidForeground, object: nil)
-        }
+        #if !targetEnvironment(macCatalyst)
+            DispatchQueue.main.async {
+                NotificationCenter.default.post(name: .liveActivityDidForeground, object: nil)
+            }
+        #endif
     }
 
     func sceneWillResignActive(_: UIScene) {

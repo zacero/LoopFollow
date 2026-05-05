@@ -8,7 +8,6 @@ struct GeneralSettingsView: View {
     @ObservedObject var appBadge = Storage.shared.appBadge
     @ObservedObject var appearanceMode = Storage.shared.appearanceMode
     @ObservedObject var showStats = Storage.shared.showStats
-    @ObservedObject var useIFCC = Storage.shared.useIFCC
     @ObservedObject var showSmallGraph = Storage.shared.showSmallGraph
     @ObservedObject var screenlockSwitchState = Storage.shared.screenlockSwitchState
     @ObservedObject var showDisplayName = Storage.shared.showDisplayName
@@ -29,6 +28,9 @@ struct GeneralSettingsView: View {
     @ObservedObject var speakHighBG = Storage.shared.speakHighBG
     @ObservedObject var speakHighBGLimit = Storage.shared.speakHighBGLimit
 
+    // Telemetry — see LoopFollow/Helpers/Telemetry.swift
+    @ObservedObject var telemetryEnabled = Storage.shared.telemetryEnabled
+
     var body: some View {
         NavigationView {
             Form {
@@ -44,7 +46,6 @@ struct GeneralSettingsView: View {
                         }
                     }
                     Toggle("Display Stats", isOn: $showStats.value)
-                    Toggle("Use IFCC A1C", isOn: $useIFCC.value)
                     Toggle("Display Small Graph", isOn: $showSmallGraph.value)
                     Toggle("Color BG Text", isOn: $colorBGText.value)
                     Toggle("Keep Screen Active", isOn: $screenlockSwitchState.value)
@@ -131,6 +132,17 @@ struct GeneralSettingsView: View {
                             }
                         }
                     }
+                }
+
+                Section("Diagnostics") {
+                    Toggle("Send anonymous usage stats", isOn: $telemetryEnabled.value)
+                        .onChange(of: telemetryEnabled.value) { newValue in
+                            if newValue {
+                                TelemetryClient.shared.scheduleRecurring()
+                            }
+                        }
+                    NavigationLink("What's sent") { TelemetryPreviewView() }
+                    NavigationLink("Privacy") { TelemetryPrivacyView() }
                 }
             }
         }

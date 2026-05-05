@@ -71,13 +71,8 @@ struct RemoteSettingsView: View {
                         Image(systemName: "square.and.arrow.down")
                             .foregroundColor(.blue)
                         Text("Import/Export Settings")
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundColor(.secondary)
-                            .font(.caption)
                     }
                 }
-                .buttonStyle(.plain)
             }
 
             // MARK: - Meal Section (for TRC only)
